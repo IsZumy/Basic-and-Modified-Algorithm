@@ -1,0 +1,57 @@
+#include <iostream>
+#include <vector>
+#include <random>
+#include <algorithm>
+
+using namespace std;
+
+typedef pair<int, int> Item;
+
+vector<int> knapsackGRASP(const vector<Item>& items, int maxWeight) {
+    int n = items.size();
+    vector<int> candidateList;
+    int totalValue = 0;
+    int totalWeight = 0;
+    vector<int> selectedItems;
+    
+    // Build the candidate list
+    for (int i = 0; i < n; i++) {
+        if (items[i].second <= maxWeight - totalWeight) {
+            candidateList.push_back(i);
+        }
+    }
+    
+    // Select items greedily with randomization
+    mt19937 rng(random_device{}());
+    while (!candidateList.empty()) {
+        vector<int> rcl;
+        int maxVal = 0;
+        for (int i : candidateList) {
+            maxVal = max(maxVal, items[i].first);
+        }
+        for (int i : candidateList) {
+            if (items[i].first >= maxVal) {
+                rcl.push_back(i);
+            }
+        }
+        int selectedItem = rcl[uniform_int_distribution<int>(0, rcl.size() - 1)(rng)];
+        selectedItems.push_back(selectedItem);
+        totalValue += items[selectedItem].first;
+        totalWeight += items[selectedItem].second;
+        candidateList.erase(remove(candidateList.begin(), candidateList.end(), selectedItem), candidateList.end());
+    }
+    
+    return selectedItems;
+}
+
+int main() {
+    vector<Item> items = {{4, 2}, {5, 3}, {7, 4}, {8, 5}};
+    int maxWeight = 7;
+    vector<int> selectedItems = knapsackGRASP(items, maxWeight);
+    cout << "Selected items: ";
+    for (int i : selectedItems) {
+        cout << i << " ";
+    }
+    cout << endl;
+    return 0;
+}
