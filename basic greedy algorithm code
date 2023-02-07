@@ -1,0 +1,42 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+typedef pair<int, int> Item;
+
+vector<int> knapsackGreedy(const vector<Item>& items, int maxWeight) {
+    int n = items.size();
+    vector<pair<double, int>> ratioItems;
+    for (int i = 0; i < n; i++) {
+        ratioItems.push_back({1.0 * items[i].first / items[i].second, i});
+    }
+    sort(ratioItems.rbegin(), ratioItems.rend());
+    
+    int totalValue = 0;
+    int totalWeight = 0;
+    vector<int> selectedItems;
+    
+    for (int i = 0; i < n; i++) {
+        if (totalWeight + items[ratioItems[i].second].second <= maxWeight) {
+            selectedItems.push_back(ratioItems[i].second);
+            totalValue += items[ratioItems[i].second].first;
+            totalWeight += items[ratioItems[i].second].second;
+        }
+    }
+    
+    return selectedItems;
+}
+
+int main() {
+    vector<Item> items = {{4, 2}, {5, 3}, {7, 4}, {8, 5}};
+    int maxWeight = 7;
+    vector<int> selectedItems = knapsackGreedy(items, maxWeight);
+    cout << "Selected items: ";
+    for (int i : selectedItems) {
+        cout << i << " ";
+    }
+    cout << endl;
+    return 0;
+}
